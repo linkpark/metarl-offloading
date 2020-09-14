@@ -117,12 +117,12 @@ class OffloadingTaskGraph(object):
         Args:
             file_name: the raw file of the task graph
         """
-    def __init__(self, file_name, is_matrix=False):
-        self._parse_from_dot(file_name, is_matrix)
+    def __init__(self, file_name):
+        self._parse_from_dot(file_name)
 
     # add task list to
-    def _parse_from_dot(self, file_name, is_matrix):
-        parser = OffloadingDotParser(file_name, is_matrix)
+    def _parse_from_dot(self, file_name):
+        parser = OffloadingDotParser(file_name)
         task_list = parser.generate_task_list()
 
         self.task_number = len(task_list)
