@@ -2,7 +2,7 @@ import os
 import joblib
 
 import numpy as np
-import tf.compat.v1 as tf
+import tensorflow.compat.v1 as tf
 import policies.model_helper as model_helper
 
 from tensorflow.python.ops import control_flow_ops
