@@ -58,15 +58,15 @@ class PPOReptile():
         for i in range(self.meta_batch_size):
             self.new_logits.append(self.policy.meta_policies[i].network.decoder_logits)
             self.decoder_inputs.append(self.policy.meta_policies[i].decoder_inputs)
-            self.old_logits.append(tf.placeholder(dtype=tf.float32, shape=[None, None, self.policy.action_dim], name='old_logits_ph_task_'+str(i)))
+            self.old_logits.append(tf.compat.v1.placeholder(dtype=tf.float32, shape=[None, None, self.policy.action_dim], name='old_logits_ph_task_'+str(i)))
             self.actions.append(self.policy.meta_policies[i].decoder_targets)
             self.obs.append(self.policy.meta_policies[i].obs)
             self.vpred.append(self.policy.meta_policies[i].vf)
             self.decoder_full_length.append(self.policy.meta_policies[i].decoder_full_length)
 
-            self.old_v.append(tf.placeholder(dtype=tf.float32, shape=[None, None], name='old_v_ph_task_'+str(i)))
-            self.advs.append(tf.placeholder(dtype=tf.float32, shape=[None, None], name='advs_ph_task'+str(i)))
-            self.r.append(tf.placeholder(dtype=tf.float32, shape=[None, None], name='r_ph_task_'+str(i)))
+            self.old_v.append(tf.compat.v1.placeholder(dtype=tf.float32, shape=[None, None], name='old_v_ph_task_'+str(i)))
+            self.advs.append(tf.compat.v1.placeholder(dtype=tf.float32, shape=[None, None], name='advs_ph_task'+str(i)))
+            self.r.append(tf.compat.v1.placeholder(dtype=tf.float32, shape=[None, None], name='r_ph_task_'+str(i)))
 
             with tf.variable_scope("inner_update_parameters_task_"+str(i)) as scope:
                 likelihood_ratio = self.policy.distribution.likelihood_ratio_sym(self.actions[i], self.old_logits[i], self.new_logits[i])

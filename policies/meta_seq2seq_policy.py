@@ -350,10 +350,10 @@ class Seq2SeqNetwork():
         return outputs, last_state
 
     def get_variables(self):
-        return tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, self.scope)
+        return tf.compat.v1.get_collection(tf.compat.v1.GraphKeys.GLOBAL_VARIABLES, self.scope)
 
     def get_trainable_variables(self):
-        return tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, self.scope)
+        return tf.compat.v1.get_collection(tf.compat.v1.GraphKeys.TRAINABLE_VARIABLES, self.scope)
 
 
 class Seq2SeqPolicy():
@@ -396,7 +396,7 @@ class Seq2SeqPolicy():
         self._dist = CategoricalPd(vocab_size)
 
     def get_actions(self, observations):
-        sess = tf.get_default_session()
+        sess = tf.compat.v1.get_default_session()
 
         decoder_full_length = np.array( [observations.shape[1]] * observations.shape[0] , dtype=np.int32)
 
@@ -468,7 +468,7 @@ class MetaSeq2SeqPolicy():
                                                     vocab_size, name="task_"+str(i)+"_policy"))
 
             self.assign_old_eq_new_tasks.append(
-                U.function([], [], updates=[tf.assign(oldv, newv)
+                U.function([], [], updates=[tf.compat.v1.assign(oldv, newv)
                                             for (oldv, newv) in
                                             zipsame(self.meta_policies[i].get_variables(), self.core_policy.get_variables())])
                 )
