@@ -27,8 +27,9 @@ class Trainer(object):
 
     def train(self):
         """
-        Implement the repilte algorithm for ppo reinforcement learning
+        Implement the MRLCO training process for task offloading problem
         """
+        
         start_time = time.time()
         avg_ret = []
         avg_loss = []
@@ -144,13 +145,14 @@ if __name__ == "__main__":
                                 time_major=False)
 
     action, greedy_finish_time = env.greedy_solution()
-    # print("avg greedy solution: ", np.mean(finish_time))
-    # print()
-    # finish_time, energy_cost = env.get_all_mec_execute_time()
-    # print("avg all remote solution: ", np.mean(finish_time))
-    # print()
-    # finish_time, energy_cost = env.get_all_locally_execute_time()
-    # print("avg all local solution: ", np.mean(finish_time))
+    print("avg greedy solution: ", np.mean(greedy_finish_time))
+    print()
+    finish_time = env.get_all_mec_execute_time()
+    print("avg all remote solution: ", np.mean(finish_time))
+    print()
+    finish_time = env.get_all_locally_execute_time()
+    print("avg all local solution: ", np.mean(finish_time))
+    print()
 
     baseline = ValueFunctionBaseline()
 
