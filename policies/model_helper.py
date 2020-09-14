@@ -2,12 +2,6 @@ import numpy as np
 import tensorflow as tf
 import utils.logger as logger
 
-def get_device_str(device_id, num_gpus):
-  """Return a device string for multi-GPU setup."""
-  if num_gpus == 0:
-    return "/cpu:0"
-  device_str_output = "/gpu:%d" % (device_id % num_gpus)
-  return device_str_output
 
 def _single_cell(unit_type, num_units, forget_bias, dropout, mode,
                  residual_connection=False, device_str=None, residual_fn=None):
@@ -48,12 +42,6 @@ def _single_cell(unit_type, num_units, forget_bias, dropout, mode,
         single_cell, residual_fn=residual_fn)
     #logger.info("  %s" % type(single_cell).__name__)
 
-  # Device Wrapper
-  if device_str:
-    single_cell = tf.contrib.rnn.DeviceWrapper(single_cell, device_str)
-    #logger.info("  %s, device=%s" %
-    #                (type(single_cell).__name__, device_str))
-
   return single_cell
 
 
@@ -75,7 +63,6 @@ def _cell_list(unit_type, num_units, num_layers, num_residual_layers,
         dropout=dropout,
         mode=mode,
         residual_connection=(i >= num_layers - num_residual_layers),
-        device_str=get_device_str(i + base_gpu, num_gpus),
         residual_fn=residual_fn
     )
     #logger.info("")
