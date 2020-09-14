@@ -93,7 +93,7 @@ class Seq2SeqNetwork():
         self.decoder_full_length = decoder_full_length
 
         with tf.compat.v1.variable_scope(name, reuse=self.reuse, initializer=tf.glorot_normal_initializer()):
-            self.scope = tf.get_variable_scope().name
+            self.scope = tf.compat.v1.get_variable_scope().name
             self.embeddings = tf.Variable(tf.random.uniform(
                 [self.n_features,
                  self.encoder_hidden_unit],

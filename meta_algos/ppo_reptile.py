@@ -68,7 +68,7 @@ class PPOReptile():
             self.advs.append(tf.compat.v1.placeholder(dtype=tf.float32, shape=[None, None], name='advs_ph_task'+str(i)))
             self.r.append(tf.compat.v1.placeholder(dtype=tf.float32, shape=[None, None], name='r_ph_task_'+str(i)))
 
-            with tf.variable_scope("inner_update_parameters_task_"+str(i)) as scope:
+            with tf.compat.v1.variable_scope("inner_update_parameters_task_"+str(i)) as scope:
                 likelihood_ratio = self.policy.distribution.likelihood_ratio_sym(self.actions[i], self.old_logits[i], self.new_logits[i])
 
                 clipped_obj = tf.minimum(likelihood_ratio * self.advs[i] ,
@@ -99,7 +99,7 @@ class PPOReptile():
 
         # Outer update for the parameters
         # feed in the parameters of inner policy network and update outer parameters.
-        with tf.variable_scope("outer_update_parameters") as scope:
+        with tf.compat.v1.variable_scope("outer_update_parameters") as scope:
             core_network_parameters = self.policy.core_policy.get_trainable_variables()
             self.grads_placeholders = []
 

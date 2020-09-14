@@ -3,6 +3,9 @@ import numpy as np
 import time
 from utils import logger
 
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
+
 
 class Trainer(object):
     def __init__(self,algo,
@@ -191,7 +194,7 @@ if __name__ == "__main__":
                         start_itr=0,
                         inner_batch_size=1000)
 
-    with tf.Session() as sess:
+    with tf.compat.v1.Session() as sess:
         sess.run(tf.global_variables_initializer())
         avg_ret, avg_loss, avg_latencies = trainer.train()
 
