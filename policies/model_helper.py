@@ -2,6 +2,7 @@ import numpy as np
 import tensorflow as tf
 import utils.logger as logger
 
+tf.get_logger().setLevel('WARNING')
 
 def _single_cell(unit_type, num_units, forget_bias, dropout, mode,
                  residual_connection=False, device_str=None, residual_fn=None):

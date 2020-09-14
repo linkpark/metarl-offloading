@@ -108,8 +108,7 @@ if __name__ == "__main__":
     from baselines.vf_baseline import ValueFunctionBaseline
     from meta_algos.ppo_reptile import PPOReptile
 
-    tf.get_logger().setLevel('WARNING')
-
+    tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
     logger.configure(dir="./meta_offloading20_log-inner_step1/", format_strs=['stdout', 'log', 'csv'])
 
     META_BATCH_SIZE = 10
