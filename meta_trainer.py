@@ -106,7 +106,7 @@ if __name__ == "__main__":
     from samplers.seq2seq_meta_sampler import Seq2SeqMetaSampler
     from samplers.seq2seq_meta_sampler_process import Seq2SeqMetaSamplerProcessor
     from baselines.vf_baseline import ValueFunctionBaseline
-    from meta_algos.ppo_reptile import PPOReptile
+    from meta_algos.MRLCO import MRLCO
 
     tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
     logger.configure(dir="./meta_offloading20_log-inner_step1/", format_strs=['stdout', 'log', 'csv'])
@@ -171,7 +171,7 @@ if __name__ == "__main__":
                                                    gae_lambda=0.95,
                                                    normalize_adv=True,
                                                    positive_adv=False)
-    algo = PPOReptile(policy=meta_policy,
+    algo = MRLCO(policy=meta_policy,
                          meta_sampler=sampler,
                          meta_sampler_process=sample_processor,
                          inner_lr=5e-4,

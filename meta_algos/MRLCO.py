@@ -3,7 +3,7 @@ import numpy as np
 import itertools
 
 # this is the tf graph version of reptile:
-class PPOReptile():
+class MRLCO():
     def __init__(self,
                  policy,
                  meta_batch_size,
