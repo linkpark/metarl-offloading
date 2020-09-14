@@ -46,3 +46,20 @@ python meta_evaluator.py
 
 The training might take long time because of the large training set. All the training results and evaluation results can be found in the log file. 
 
+Related paper: [Fast Adaptive Task Offloading in Edge Computing based on Meta Reinforcement Learning
+](https://arxiv.org/abs/2008.02033)
+
+If you like this research, please cite this paper by
+
+```buildoutcfg
+@article{wang2020fast,
+  title={Fast Adaptive Task Offloading in Edge Computing Based on Meta Reinforcement Learning},
+  author={Wang, Jin and Hu, Jia and Min, Geyong and Zomaya, Albert Y and Georgalas, Nektarios},
+  journal={IEEE Transactions on Parallel and Distributed Systems},
+  volume={32},
+  number={1},
+  pages={242--253},
+  year={2020},
+  publisher={IEEE}
+}
+```
