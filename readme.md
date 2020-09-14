@@ -49,7 +49,7 @@ The training might take long time because of the large training set. All the tra
 Related paper: [Fast Adaptive Task Offloading in Edge Computing based on Meta Reinforcement Learning
 ](https://arxiv.org/abs/2008.02033)
 
-If you like this research, please cite this paper by
+If you like this research, please cite this paper:
 
 ```buildoutcfg
 @article{wang2020fast,
