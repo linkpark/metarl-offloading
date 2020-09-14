@@ -113,7 +113,7 @@ class Seq2SeqNetwork():
                                                          self.n_features,
                                                          dtype=tf.float32)
 
-            self.output_layer = tf.compat.v1.layers.dense(self.n_features, use_bias=False, name="output_projection")
+            self.output_layer = tf.compat.v1.layers.Dense(self.n_features, use_bias=False, name="output_projection")
 
             if self.is_bidencoder:
                 self.encoder_outputs, self.encoder_state = self.create_bidrect_encoder(hparams)
