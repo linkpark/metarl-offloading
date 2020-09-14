@@ -83,7 +83,7 @@ if __name__ == "__main__":
     from meta_algos.ppo_offloading import PPO
     from utils import utils, logger
 
-    logger.configure(dir="./meta_evaluate_ppo_log/offload8", format_strs=['stdout', 'log', 'csv'])
+    logger.configure(dir="./meta_evaluate_ppo_log/task_offloading", format_strs=['stdout', 'log', 'csv'])
 
     resource_cluster = Resources(mec_process_capable=(10.0 * 1024 * 1024),
                                  mobile_process_capable=(1.0 * 1024 * 1024),
@@ -100,9 +100,7 @@ if __name__ == "__main__":
     print("calculate baseline solution======")
 
     env.set_task(0)
-
     action, finish_time = env.greedy_solution()
-
     target_batch, task_finish_time_batch = env.get_reward_batch_step_by_step(action[env.task_id],
                                           env.task_graphs_batchs[env.task_id],
                                           env.max_running_time_batchs[env.task_id],
@@ -165,35 +163,5 @@ if __name__ == "__main__":
         sess.run(tf.compat.v1.global_variables_initializer())
         policy.load_variables(load_path="./meta_model_offload20_25_batch_10/meta_model_2900.ckpt")
         avg_ret, avg_pg_loss, avg_vf_loss, avg_latencies = trainer.train()
-
-    import matplotlib.pyplot as plt
-
-    x = np.arange(0, len(avg_ret), 1)
-
-    plt.plot(x, avg_ret)
-    plt.xlabel('episode')
-    plt.ylabel('reward')
-    plt.show()
-
-    x = np.arange(0, len(avg_pg_loss), 1)
-
-    plt.plot(x, avg_pg_loss)
-    plt.xlabel('episode')
-    plt.ylabel('policy loss')
-    plt.show()
-
-    x = np.arange(0, len(avg_vf_loss), 1)
-
-    plt.plot(x, avg_vf_loss)
-    plt.xlabel('episode')
-    plt.ylabel('value loss')
-    plt.show()
-
-    x = np.arange(0, len(avg_latencies), 1)
-
-    plt.plot(x, avg_latencies)
-    plt.xlabel('episode')
-    plt.ylabel('avg_latency')
-    plt.show()
 
 

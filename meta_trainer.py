@@ -195,27 +195,3 @@ if __name__ == "__main__":
         avg_ret, avg_loss, avg_latencies = trainer.train()
 
 
-    import matplotlib.pyplot as plt
-
-    x = np.arange(0, len(avg_ret), 1)
-
-    plt.plot(x, avg_ret)
-    plt.xlabel('episode')
-    plt.ylabel('reward')
-    plt.show()
-
-    x = np.arange(0, len(avg_loss), 1)
-
-    plt.plot(x, avg_loss)
-    plt.xlabel('episode')
-    plt.ylabel('loss')
-    plt.show()
-
-    x = np.arange(0, len(avg_latencies), 1)
-
-    plt.plot(x, avg_latencies)
-    plt.xlabel('episode')
-    plt.ylabel('avg_latency')
-    plt.show()
-
-
