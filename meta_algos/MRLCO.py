@@ -133,7 +133,6 @@ class MRLCO():
         print("async core policy to meta-policy")
         self.policy.async_parameters()
 
-
     def UpdatePPOTarget(self, task_samples, batch_size=50):
         total_policy_losses = []
         total_value_losses = []
@@ -143,7 +142,6 @@ class MRLCO():
             total_value_losses.append(value_losses)
 
         return total_policy_losses, total_value_losses
-
 
     def UpdatePPOTargetPerTask(self, task_samples, task_id, batch_size=50):
         policy_losses = []

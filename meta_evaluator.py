@@ -98,8 +98,6 @@ if __name__ == "__main__":
                                 time_major=False)
 
     print("calculate optimal solution======")
-    #cost = env.calculate_optimal_solution()
-    #print("avg optimal_solution: ", np.mean(cost))
 
     env.set_task(0)
 
@@ -144,7 +142,6 @@ if __name__ == "__main__":
                                               gae_lambda=0.95,
                                               normalize_adv=True,
                                               positive_adv=False)
-
     algo = PPO(policy=policy,
                meta_sampler=sampler,
                meta_sampler_process=sample_processor,
@@ -156,7 +153,6 @@ if __name__ == "__main__":
     trainer = Trainer(algo=algo,
                       env=env,
                       sampler=sampler,
-
                       sample_processor=sample_processor,
                       policy=policy,
                       n_itr=21,
@@ -167,7 +163,6 @@ if __name__ == "__main__":
     with tf.Session() as sess:
         sess.run(tf.compat.v1.global_variables_initializer())
         policy.load_variables(load_path="./meta_model_offload20_25_batch_10/meta_model_2900.ckpt")
-        #policy.load_variables(load_path="./ppo_model/ppo_model_900.ckpt")
         avg_ret, avg_pg_loss, avg_vf_loss, avg_latencies = trainer.train()
 
     import matplotlib.pyplot as plt
