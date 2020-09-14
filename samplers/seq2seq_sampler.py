@@ -11,7 +11,7 @@ import tensorflow as tf
 
 class Seq2SeqSampler(Sampler):
     """
-    Sampler for PPO-RL
+    Sampler for MRLCO
 
     Args:
         env (meta_policy_search.envs.base.MetaEnv) : environment object
@@ -68,7 +68,6 @@ class Seq2SeqSampler(Sampler):
         while n_samples < self.total_samples:
             # execute policy
             t = time.time()
-            # obs_per_task = np.split(np.asarray(obses), self.meta_batch_size)
             obs_per_task = np.array(obses)
 
             actions, logits, values = policy.get_actions(obs_per_task)
@@ -76,8 +75,6 @@ class Seq2SeqSampler(Sampler):
 
             # step environments
             t = time.time()
-            # actions = np.concatenate(actions)
-
             next_obses, rewards, dones, env_infos = self.env.step(actions)
 
             env_time += time.time() - t
@@ -121,72 +118,6 @@ class Seq2SeqSampler(Sampler):
 
 def _get_empty_running_paths_dict():
     return dict()
-
-
-
-if __name__ == "__main__":
-    from env.mec_offloaing_envs.offloading_env import Resources
-    from env.mec_offloaing_envs.offloading_env import OffloadingEnvironment
-    from policies.seq2seq_policy import Seq2SeqPolicy
-    from samplers.seq2seq_sampler_process import Seq2SeSamplerProcessor
-    from baselines.linear_baseline import LinearFeatureBaseline
-    from meta_algos.ppo_reptile import PPOReptile
-
-    resource_cluster = Resources(mec_process_capable=(10.0 * 1024 * 1024),
-                                 mobile_process_capable=(1.0 * 1024 * 1024),
-                                 bandwidth_up=7.0, bandwidth_dl=7.0)
-
-    env = OffloadingEnvironment(resource_cluster=resource_cluster,
-                                batch_size=10,
-                                graph_number=10,
-                                graph_file_paths=[
-                                    "D:\\Code\\MetaRL-offloading-Reptile\\env\\mec_offloaing_envs\\data\\offload_random10\\random.10.",
-                                    "D:\\Code\\MetaRL-offloading-Reptile\\env\\mec_offloaing_envs\\data\\offload_random10\\random.10.",
-                                    "D:\\Code\\MetaRL-offloading-Reptile\\env\\mec_offloaing_envs\\data\\offload_random10\\random.10.",
-                                    "D:\\Code\\MetaRL-offloading-Reptile\\env\\mec_offloaing_envs\\data\\offload_random10\\random.10.",
-                                    "D:\\Code\\MetaRL-offloading-Reptile\\env\\mec_offloaing_envs\\data\\offload_random10\\random.10."],
-                                time_major=False)
-    env.set_task(0)
-
-    policy = Seq2SeqPolicy(name="pi",
-                           obs_dim=17,
-                           encoder_units=64,
-                           decoder_units=64,
-                           vocab_size=2)
-
-    sampler = Seq2SeqSampler(env,
-                             policy,
-                             rollouts_per_meta_task=1,
-                             max_path_length=5000,
-                             envs_per_task=None,
-                             parallel=False)
-
-    baseline = LinearFeatureBaseline()
-
-    sample_processor = Seq2SeSamplerProcessor(baseline=baseline,
-                                              discount=0.99,
-                                              gae_lambda=0.95,
-                                              normalize_adv=True,
-                                              positive_adv=True)
-
-    with tf.Session() as sess:
-        sess.run(tf.global_variables_initializer())
-
-        paths = sampler.obtain_samples(log=True, log_prefix='Step')
-
-        print(len(paths))
-        print(paths[0]["values"])
-
-        processing_data = sample_processor.process_samples(paths)
-
-        print("processing data shape is:", processing_data['observations'].shape)
-        #
-        # print("processsing data action is: ", processing_data['actions'][0:10])
-        # print("processing data reward is: ", processing_data['rewards'][0:10])
-        # print("processing data action is: ", processing_data['actions'][10:20])
-        # print("processing data reward is: ", processing_data['rewards'][10:20])
-
-
 
 
 

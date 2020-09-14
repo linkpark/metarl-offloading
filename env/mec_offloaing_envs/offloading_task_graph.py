@@ -22,7 +22,13 @@ class OffloadingTask(object):
 
 
 class OffloadingDotParser(object):
-    def __init__(self, file_name, is_matrix):
+    """
+        Parser for Task_graphs
+
+        Args:
+            file_name: the graphviz file name
+        """
+    def __init__(self, file_name):
         self.succ_task_for_ids = {}
         self.pre_task_for_ids = {}
 
@@ -105,6 +111,12 @@ class OffloadingDotParser(object):
 
 
 class OffloadingTaskGraph(object):
+    """
+        The Parsed Task Graph
+
+        Args:
+            file_name: the raw file of the task graph
+        """
     def __init__(self, file_name, is_matrix=False):
         self._parse_from_dot(file_name, is_matrix)
 
@@ -163,7 +175,6 @@ class OffloadingTaskGraph(object):
 
         self.edge_set.append(edge)
 
-    # TODO: change the encode point sequence to cost time
     def encode_point_sequence(self):
         point_sequence = []
         for i in range(self.task_number):
@@ -322,55 +333,3 @@ class OffloadingTaskGraph(object):
             dot.edge(str(e[0]), str(e[4]), constraint='true', label="%.6f" % e[3])
 
         dot.render(path, view=False)
-
-if __name__ == "__main__":
-    task_graph = OffloadingTaskGraph('../data/offload_random10/random.10.17.gv')
-    task_graph.render('test')
-
-    np.set_printoptions(suppress=True)
-    encode_point = task_graph.encode_point_sequence()
-
-    print(np.array(encode_point).shape)
-    print(np.array(encode_point))
-
-    # task_graph = TaskGraph("../data/CyberShake_30/CyberShake.n.30.0.xml")
-    # task_graph.render("test")
-    # print(np.array(task_graph.encode_point_sequence()))
-    # print(np.array(task_graph.encode_point_sequence()).shape)
-    # print()
-    '''
-
-    cost_set_index = np.nonzero(task_graph.dependency)
-    none_zero_value = task_graph.dependency[cost_set_index]
-    print("len of non zero value is {}".format(len(none_zero_value)))
-
-    dependency = np.copy(task_graph.dependency)
-    dependency[dependency < 0.01] = 0.0
-
-    cost_set_index = np.nonzero(task_graph.dependency)
-    none_zero_value = task_graph.dependency[cost_set_index]
-    print("len of non zero value is {}".format(len(none_zero_value)))
-
-    np.set_printoptions(precision=5, suppress=True)
-
-    cost_set_index = np.nonzero(dependency)
-    none_zero_value = dependency[cost_set_index]
-    print("len of non zero value is {}".format(len(none_zero_value)))
-
-    print()
-    print("Norm dependency is: ")
-    print(task_graph.norm_dependencies)
-    print(len(task_graph.norm_dependencies[np.nonzero(task_graph.norm_dependencies)]))
-
-    from RLWorkflow.environment.resource_cluster import ResourceCluster
-    resource_cluster = ResourceCluster(5)
-    plan = np.zeros(20, dtype=np.int32)
-
-    cost = resource_cluster.get_norm_cost_through_step_by_step_schedule(plan, task_graph)
-
-    print(cost)
-
-    # Test max running time and min running time
-    print(task_graph.max_runtime)
-    print(task_graph.min_runtime)
-    '''
