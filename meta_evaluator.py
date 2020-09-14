@@ -97,7 +97,7 @@ if __name__ == "__main__":
                                     ],
                                 time_major=False)
 
-    print("calculate optimal solution======")
+    print("calculate baseline solution======")
 
     env.set_task(0)
 
@@ -150,6 +150,7 @@ if __name__ == "__main__":
                clip_value=0.2,
                max_grad_norm=None)
 
+    # define the trainer of ppo to evaluate the performance of the trained meta policy for new tasks.
     trainer = Trainer(algo=algo,
                       env=env,
                       sampler=sampler,

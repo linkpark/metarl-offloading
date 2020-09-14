@@ -54,7 +54,6 @@ class MRLCO():
 
     def build_graph(self):
         # build inner update for each tasks
-
         for i in range(self.meta_batch_size):
             self.new_logits.append(self.policy.meta_policies[i].network.decoder_logits)
             self.decoder_inputs.append(self.policy.meta_policies[i].decoder_inputs)
@@ -122,7 +121,7 @@ class MRLCO():
 
             update_feed_dict = {}
 
-            # calcuate the gradients:
+            # calcuate the gradient updates for the meta policy through first-order approximation.
             for i, core_var, meta_var in zip(itertools.count(), core_params, params):
                 grads = (core_var - meta_var) / self.inner_lr / self.num_inner_grad_steps / self.meta_batch_size / self.update_numbers
                 update_feed_dict[self.grads_placeholders[i]] = grads
