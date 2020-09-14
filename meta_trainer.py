@@ -118,8 +118,8 @@ if __name__ == "__main__":
                                  bandwidth_up=7.0, bandwidth_dl=7.0)
 
     env = OffloadingEnvironment(resource_cluster=resource_cluster,
-                                batch_size=5,
-                                graph_number=5,
+                                batch_size=100,
+                                graph_number=100,
                                 graph_file_paths=[
                                     "./env/mec_offloaing_envs/data/meta_offloading_20/offload_random20_1/random.20.",
                                     "./env/mec_offloaing_envs/data/meta_offloading_20/offload_random20_2/random.20.",

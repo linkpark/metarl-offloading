@@ -6,6 +6,16 @@ import numpy as np
 import os
 
 class Resources(object):
+    """
+    This class denotes the MEC server and Mobile devices (computation resources)
+
+    Args:
+        mec_process_capable: computation capacity of the MEC server
+        mobile_process_capable: computation capacity of the mobile device
+        bandwidth_up: wireless uplink band width
+        bandwidth_dl: wireless downlink band width
+    """
+
     def __init__(self, mec_process_capable,
                   mobile_process_capable, bandwidth_up = 7.0, bandwidth_dl = 7.0):
         self.mec_process_capble = mec_process_capable
@@ -13,22 +23,10 @@ class Resources(object):
         self.mobile_process_avaliable_time = 0.0
         self.mec_process_avaliable_time = 0.0
 
-        # set the bandwidth of uplink channel and donlink channel
         self.bandwidth_up = bandwidth_up
         self.bandwidth_dl = bandwidth_dl
 
-        self.Pap = 1.258
-        self.Ptx = 1.258
-
-        self.omega0 = 1.0
-
-    def up_transmission_cost(self, data, distance=0.0):
-        #PLDbm = 128.1 + 37.6 * np.log10(distance / 1000.0)
-        #PLw = 10.0 ** ((PLDbm) / 10.0)
-
-        #rate = self.bandwith_up * np.log2( 1 + self.Pap * PLw / (self.bandwith_up * self.omega0))
-
-        # rate = 7.0 * (1024.0 * 1024.0 / 8.0)
+    def up_transmission_cost(self, data):
         rate = self.bandwidth_up * (1024.0 * 1024.0 / 8.0)
 
         transmission_time = data / rate
@@ -39,12 +37,7 @@ class Resources(object):
         self.mec_process_avaliable_time = 0.0
         self.mobile_process_avaliable_time = 0.0
 
-    def dl_transmission_cost(self, data, distance=0.0):
-        #PLDbm = 128.1 + 37.6 * np.log10( distance / 1000.0)
-        #PLw = 10.0 ** ((PLDbm) / 10.0)
-
-        #rate = self.bandwith_dl * np.log2(1 + self.Pap * PLw / (self.bandwith_dl * self.omega0))
-
+    def dl_transmission_cost(self, data):
         rate = self.bandwidth_dl * (1024.0 * 1024.0 / 8.0)
         transmission_time = data / rate
 
@@ -64,8 +57,7 @@ class Resources(object):
 class OffloadingEnvironment(MetaEnv):
     def __init__(self, resource_cluster, batch_size,
                  graph_number,
-                 graph_file_paths, time_major,
-                 lambda_t=1.0, lambda_e=0.0):
+                 graph_file_paths, time_major):
         self.resource_cluster = resource_cluster
         self.task_graphs_batchs = []
         self.encoder_batchs = []
@@ -75,6 +67,7 @@ class OffloadingEnvironment(MetaEnv):
         self.min_running_time_batchs = []
         self.graph_file_paths = graph_file_paths
 
+        # load all the task graphs into the evnironment
         for graph_file_path in graph_file_paths:
             encoder_batchs, encoder_lengths, task_graph_batchs, decoder_full_lengths, max_running_time_batchs, min_running_time_batchs = \
                 self.generate_point_batch_for_random_graphs(batch_size, graph_number, graph_file_path, time_major)
@@ -88,7 +81,6 @@ class OffloadingEnvironment(MetaEnv):
 
         self.total_task = len(self.encoder_batchs)
         self.optimal_solution = -1
-        self.optimal_energy = -1
         self.task_id = -1
         self.time_major = time_major
         self.input_dim = np.array(encoder_batchs[0]).shape[-1]
@@ -96,19 +88,6 @@ class OffloadingEnvironment(MetaEnv):
         # set the file paht of task graphs.
         self.graph_file_paths = graph_file_paths
         self.graph_number = graph_number
-
-        # these 3 parameters are used to calculate the processing energy consumption
-        # self.rho = 1.25 * 10 ** -26
-        # self.f_l = 0.8 * 10 ** 9
-        # self.zeta = 3
-
-        # these 2 parameters are used to calculate the transmission energy consumption
-        self.ptx = 1.258
-        self.prx = 1.181
-
-        # control the trade off between latency and energy consumption
-        self.lambda_t = lambda_t
-        self.lambda_e = lambda_e
 
 
         self.local_exe_time = self.get_all_locally_execute_time()
@@ -223,42 +202,6 @@ class OffloadingEnvironment(MetaEnv):
         return np.array(self.encoder_batchs[self.task_id])
 
     def render(self, mode='human'):
-        """Renders the environment.
-
-        The set of supported modes varies per environment. (And some
-        environments do not support rendering at all.) By convention,
-        if mode is:
-
-        - human: render to the current display or terminal and
-          return nothing. Usually for human consumption.
-        - rgb_array: Return an numpy.ndarray with shape (x, y, 3),
-          representing RGB values for an x-by-y pixel image, suitable
-          for turning into a video.
-        - ansi: Return a string (str) or StringIO.StringIO containing a
-          terminal-style text representation. The text can include newlines
-          and ANSI escape sequences (e.g. for colors).
-
-        Note:
-            Make sure that your class's metadata 'render.modes' key includes
-              the list of supported modes. It's recommended to call super()
-              in implementations to use the functionality of this method.
-
-        Args:
-            mode (str): the mode to render with
-
-        Example:
-
-        class MyEnv(Env):
-            metadata = {'render.modes': ['human', 'rgb_array']}
-
-            def render(self, mode='human'):
-                if mode == 'rgb_array':
-                    return np.array(...) # return RGB frame suitable for video
-                elif mode == 'human':
-                    ... # pop up a window and render
-                else:
-                    super(MyEnv, self).render(mode=mode) # just raise an exception
-        """
         pass
 
     def generate_point_batch_for_random_graphs(self, batch_size, graph_number, graph_file_path, time_major):
@@ -534,6 +477,7 @@ class OffloadingEnvironment(MetaEnv):
         return result_plan, finish_time_batchs
 
     def calculate_optimal_solution(self):
+        # Finding the optimal solution via exhausting search the solution space.
         def exhaustion_plans(n):
             plan_batch = []
 
@@ -635,26 +579,5 @@ class OffloadingEnvironment(MetaEnv):
 
         return result_plan[self.task_id], finish_time_batchs[self.task_id]
 
-if __name__ == "__main__":
-    resource_cluster = Resources(mec_process_capable=(10.0 * 1024 * 1024),
-                                 mobile_process_capable=(1.0 * 1024 * 1024),
-                                 bandwidth_up=7.0, bandwidth_dl=7.0)
 
-    env = OffloadingEnvironment(resource_cluster=resource_cluster,
-                                batch_size=10,
-                                graph_number=10,
-                                graph_file_paths=["./data/offload_random10/random.10.",
-                                                  "./data/offload_random10/random.10.",
-                                                  "./data/offload_random10/random.10.",
-                                                  "./data/offload_random10/random.10.",
-                                                  "./data/offload_random10/random.10."],
-                                time_major=False)
-
-    print(np.array(env.encoder_batchs).shape)
-
-    env.merge_graphs()
-
-    print(np.array(env.encoder_batchs).shape)
-
-    print(np.array(env.encoder_batchs[0]).shape)
 
