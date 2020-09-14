@@ -277,7 +277,7 @@ class OffloadingEnvironment(MetaEnv):
         min_running_time_batchs = []
 
         for i in range(graph_number):
-            task_graph = OffloadingTaskGraph(graph_file_path + str(i) + '.gv', is_matrix=False)
+            task_graph = OffloadingTaskGraph(graph_file_path + str(i) + '.gv')
             task_graph_list.append(task_graph)
 
             max_time, min_time = self.calculate_max_min_runningcost(task_graph.max_data_size,
