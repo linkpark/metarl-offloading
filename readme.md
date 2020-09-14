@@ -31,3 +31,15 @@ pip install pydotplus
 pip install pyprind
 pip install mpi4py
 ```
+### Start Meta Training:
+```bash
+python meta_trainer.py
+```
+All the hyperparameters are defined in `meta_trainer.py` including the log file and save path of the trained model.
+
+### Start Meta Evaluation:
+After training, you will get the meta model. In order to fast adapt the meta model for new learning tasks in MEC, we need to conduct fine-tuning steps for the trained meta moodel.
+
+```bash
+python meta_evaluator.py
+```

@@ -697,24 +697,3 @@ if __name__ == "__main__":
 
     print(np.array(env.encoder_batchs[0]).shape)
 
-    # vec_env = MetaIterativeEnvExecutor(env, 5, 1, 10)
-    #
-    # print("environment number:", vec_env.num_envs)
-    # task_ids = env.sample_tasks(5)
-    #
-    # print(task_ids)
-    #
-    # vec_env.set_tasks(task_ids)
-    #
-    # action = np.ones((10,10))
-    # actions = [action] * 5
-    #
-    # obs, rewards, dones, env_infos = vec_env.step(actions)
-
-    # print(obs)
-    # print(len(rewards))
-    # print(rewards[0].shape)
-    # print(rewards[0])
-
-
-
