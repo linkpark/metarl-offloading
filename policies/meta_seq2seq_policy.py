@@ -2,7 +2,7 @@ import os
 import joblib
 
 import numpy as np
-import tensorflow as tf
+import tf.compat.v1 as tf
 import policies.model_helper as model_helper
 
 from tensorflow.python.ops import control_flow_ops
@@ -418,7 +418,7 @@ class Seq2SeqPolicy():
         return self.network.get_trainable_variables()
 
     def save_variables(self, save_path, sess=None):
-        sess = sess or tf.compat.v1.get_default_session()
+        sess = sess or tf.get_default_session()
         variables = self.get_variables()
 
         ps = sess.run(variables)
@@ -431,7 +431,7 @@ class Seq2SeqPolicy():
         joblib.dump(save_dict, save_path)
 
     def load_variables(self, load_path, sess=None):
-        sess = sess or tf.compat.v1.get_default_session()
+        sess = sess or tf.get_default_session()
         variables = self.get_variables()
 
         loaded_params = joblib.load(os.path.expanduser(load_path))
