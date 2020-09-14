@@ -13,9 +13,7 @@ from policies.distributions.categorical_pd import CategoricalPd
 import utils as U
 from utils.utils import zipsame
 
-import os
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-
+tf.get_logger().setLevel('WARNING')
 
 class FixedSequenceLearningSampleEmbedingHelper(tf.contrib.seq2seq.SampleEmbeddingHelper):
     def __init__(self, sequence_length, embedding, start_tokens, end_token, softmax_temperature=None, seed=None):
