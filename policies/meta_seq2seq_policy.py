@@ -92,9 +92,9 @@ class Seq2SeqNetwork():
 
         self.decoder_full_length = decoder_full_length
 
-        with tf.variable_scope(name, reuse=self.reuse, initializer=tf.glorot_normal_initializer()):
+        with tf.compat.v1.variable_scope(name, reuse=self.reuse, initializer=tf.glorot_normal_initializer()):
             self.scope = tf.get_variable_scope().name
-            self.embeddings = tf.Variable(tf.random_uniform(
+            self.embeddings = tf.Variable(tf.random.uniform(
                 [self.n_features,
                  self.encoder_hidden_unit],
                 -1.0, 1.0), dtype=tf.float32)
@@ -104,7 +104,7 @@ class Seq2SeqNetwork():
                                                                         self.encoder_hidden_unit,
                                                                         activation_fn = None,
                                                                         scope="encoder_embeddings",
-                                                                        reuse=tf.AUTO_REUSE)
+                                                                        reuse=tf.compat.v1.AUTO_REUSE)
 
             self.decoder_embeddings = tf.nn.embedding_lookup(self.embeddings,
                                                              self.decoder_inputs)
@@ -113,7 +113,7 @@ class Seq2SeqNetwork():
                                                          self.n_features,
                                                          dtype=tf.float32)
 
-            self.output_layer = tf.layers.Dense(self.n_features, use_bias=False, name="output_projection")
+            self.output_layer = tf.compat.v1.layers.Dense(self.n_features, use_bias=False, name="output_projection")
 
             if self.is_bidencoder:
                 self.encoder_outputs, self.encoder_state = self.create_bidrect_encoder(hparams)
@@ -125,8 +125,8 @@ class Seq2SeqNetwork():
                                                                            self.encoder_state, model="train")
             self.decoder_logits = self.decoder_outputs.rnn_output
             self.pi = tf.nn.softmax(self.decoder_logits)
-            self.q = tf.layers.dense(self.decoder_logits, self.n_features, activation=None,
-                                     reuse=tf.AUTO_REUSE, name="qvalue_layer")
+            self.q = tf.compat.v1.layers.Dense(self.decoder_logits, self.n_features, activation=None,
+                                     reuse=tf.compat.v1.AUTO_REUSE, name="qvalue_layer")
             self.vf = tf.reduce_sum(self.pi * self.q, axis=-1)
 
             self.decoder_prediction = self.decoder_outputs.sample_id
@@ -136,8 +136,8 @@ class Seq2SeqNetwork():
                                                                            self.encoder_state, model="sample")
             self.sample_decoder_logits = self.sample_decoder_outputs.rnn_output
             self.sample_pi = tf.nn.softmax(self.sample_decoder_logits)
-            self.sample_q = tf.layers.dense(self.sample_decoder_logits, self.n_features,
-                                            activation=None, reuse=tf.AUTO_REUSE, name="qvalue_layer")
+            self.sample_q = tf.compat.v1.layers.Dense(self.sample_decoder_logits, self.n_features,
+                                            activation=None, reuse=tf.compat.v1.AUTO_REUSE, name="qvalue_layer")
 
             self.sample_vf = tf.reduce_sum(self.sample_pi*self.sample_q, axis=-1)
 
@@ -156,7 +156,7 @@ class Seq2SeqNetwork():
                                                                            self.encoder_state, model="greedy")
             self.greedy_decoder_logits = self.greedy_decoder_outputs.rnn_output
             self.greedy_pi = tf.nn.softmax(self.greedy_decoder_logits)
-            self.greedy_q = tf.layers.dense(self.greedy_decoder_logits, self.n_features, activation=None, reuse=tf.AUTO_REUSE,
+            self.greedy_q = tf.compat.v1.layers.Dense(self.greedy_decoder_logits, self.n_features, activation=None, reuse=tf.compat.v1.AUTO_REUSE,
                                      name="qvalue_layer")
             self.greedy_vf = tf.reduce_sum(self.greedy_pi * self.greedy_q, axis=-1)
 
@@ -228,7 +228,7 @@ class Seq2SeqNetwork():
 
     def create_encoder(self, hparams):
         # Build RNN cell
-        with tf.variable_scope("encoder", reuse=tf.AUTO_REUSE) as scope:
+        with tf.compat.v1.variable_scope("encoder", reuse=tf.compat.v1.AUTO_REUSE) as scope:
             encoder_cell = self._build_encoder_cell(hparams=hparams,
                                                     num_layers=self.num_layers,
                                                     num_residual_layers=self.num_residual_layers)
@@ -248,7 +248,7 @@ class Seq2SeqNetwork():
         return encoder_outputs, encoder_state
 
     def create_bidrect_encoder(self, hparams):
-        with tf.variable_scope("encoder", reuse=tf.AUTO_REUSE) as scope:
+        with tf.compat.v1.variable_scope("encoder", reuse=tf.compat.v1.AUTO_REUSE) as scope:
             num_bi_layers = int(self.num_layers / 2)
             num_bi_residual_layers = int(self.num_residual_layers / 2)
             forward_cell = self._build_encoder_cell(hparams=hparams,
@@ -281,7 +281,7 @@ class Seq2SeqNetwork():
             return encoder_outputs, encoder_state
 
     def create_decoder(self, hparams, encoder_outputs, encoder_state, model):
-        with tf.variable_scope("decoder", reuse=tf.AUTO_REUSE) as decoder_scope:
+        with tf.compat.v1.variable_scope("decoder", reuse=tf.compat.v1.AUTO_REUSE) as decoder_scope:
             if model == "greedy":
                 helper = tf.contrib.seq2seq.GreedyEmbeddingHelper(
                     self.embeddings,
@@ -359,10 +359,10 @@ class Seq2SeqNetwork():
 class Seq2SeqPolicy():
     def __init__(self, obs_dim, encoder_units,
                  decoder_units, vocab_size, name="pi"):
-        self.decoder_targets = tf.placeholder(shape=[None, None], dtype=tf.int32, name="decoder_targets_ph_"+name)
-        self.decoder_inputs = tf.placeholder(shape=[None, None], dtype=tf.int32, name="decoder_inputs_ph"+name)
-        self.obs = tf.placeholder(shape=[None, None, obs_dim], dtype=tf.float32, name="obs_ph"+name)
-        self.decoder_full_length = tf.placeholder(shape=[None], dtype=tf.int32, name="decoder_full_length"+name)
+        self.decoder_targets = tf.compat.v1.placeholder(shape=[None, None], dtype=tf.int32, name="decoder_targets_ph_"+name)
+        self.decoder_inputs = tf.compat.v1.placeholder(shape=[None, None], dtype=tf.int32, name="decoder_inputs_ph"+name)
+        self.obs = tf.compat.v1.placeholder(shape=[None, None, obs_dim], dtype=tf.float32, name="obs_ph"+name)
+        self.decoder_full_length = tf.compat.v1.placeholder(shape=[None], dtype=tf.int32, name="decoder_full_length"+name)
 
         self.action_dim = vocab_size
         self.name = name
@@ -385,7 +385,7 @@ class Seq2SeqPolicy():
             is_bidencoder=False
         )
 
-        self.network = Seq2SeqNetwork( hparams = hparams, reuse=tf.AUTO_REUSE,
+        self.network = Seq2SeqNetwork( hparams = hparams, reuse=tf.compat.v1.AUTO_REUSE,
                  encoder_inputs=self.obs,
                  decoder_inputs=self.decoder_inputs,
                  decoder_full_length=self.decoder_full_length,
