@@ -113,7 +113,7 @@ class Seq2SeqNetwork():
                                                          self.n_features,
                                                          dtype=tf.float32)
 
-            self.output_layer = tf.compat.v1.layers.Dense(self.n_features, use_bias=False, name="output_projection")
+            self.output_layer = tf.compat.v1.layers.dense(self.n_features, use_bias=False, name="output_projection")
 
             if self.is_bidencoder:
                 self.encoder_outputs, self.encoder_state = self.create_bidrect_encoder(hparams)
@@ -125,7 +125,7 @@ class Seq2SeqNetwork():
                                                                            self.encoder_state, model="train")
             self.decoder_logits = self.decoder_outputs.rnn_output
             self.pi = tf.nn.softmax(self.decoder_logits)
-            self.q = tf.compat.v1.layers.Dense(self.decoder_logits, self.n_features, activation=None,
+            self.q = tf.compat.v1.layers.dense(self.decoder_logits, self.n_features, activation=None,
                                      reuse=tf.compat.v1.AUTO_REUSE, name="qvalue_layer")
             self.vf = tf.reduce_sum(self.pi * self.q, axis=-1)
 
@@ -136,7 +136,7 @@ class Seq2SeqNetwork():
                                                                            self.encoder_state, model="sample")
             self.sample_decoder_logits = self.sample_decoder_outputs.rnn_output
             self.sample_pi = tf.nn.softmax(self.sample_decoder_logits)
-            self.sample_q = tf.compat.v1.layers.Dense(self.sample_decoder_logits, self.n_features,
+            self.sample_q = tf.compat.v1.layers.dense(self.sample_decoder_logits, self.n_features,
                                             activation=None, reuse=tf.compat.v1.AUTO_REUSE, name="qvalue_layer")
 
             self.sample_vf = tf.reduce_sum(self.sample_pi*self.sample_q, axis=-1)
@@ -156,7 +156,7 @@ class Seq2SeqNetwork():
                                                                            self.encoder_state, model="greedy")
             self.greedy_decoder_logits = self.greedy_decoder_outputs.rnn_output
             self.greedy_pi = tf.nn.softmax(self.greedy_decoder_logits)
-            self.greedy_q = tf.compat.v1.layers.Dense(self.greedy_decoder_logits, self.n_features, activation=None, reuse=tf.compat.v1.AUTO_REUSE,
+            self.greedy_q = tf.compat.v1.layers.dense(self.greedy_decoder_logits, self.n_features, activation=None, reuse=tf.compat.v1.AUTO_REUSE,
                                      name="qvalue_layer")
             self.greedy_vf = tf.reduce_sum(self.greedy_pi * self.greedy_q, axis=-1)
 
