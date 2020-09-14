@@ -111,8 +111,8 @@ class OffloadingEnvironment(MetaEnv):
         self.lambda_e = lambda_e
 
 
-        self.local_exe_time, self.local_energy = self.get_all_locally_execute_time()
-        self.mec_exe_time, self.mec_energy = self.get_all_mec_execute_time()
+        self.local_exe_time = self.get_all_locally_execute_time()
+        self.mec_exe_time = self.get_all_mec_execute_time()
 
     def sample_tasks(self, n_tasks):
         """
