@@ -3,7 +3,7 @@ import joblib
 
 import numpy as np
 import tensorflow as tf
-import policies.networks.model_helper as model_helper
+import policies.model_helper as model_helper
 
 from tensorflow.python.ops import control_flow_ops
 from tensorflow.python.ops import math_ops
