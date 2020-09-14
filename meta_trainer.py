@@ -4,8 +4,7 @@ import time
 from utils import logger
 
 import os
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
-
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 class Trainer(object):
     def __init__(self,algo,
@@ -112,6 +111,7 @@ if __name__ == "__main__":
     from baselines.vf_baseline import ValueFunctionBaseline
     from meta_algos.ppo_reptile import PPOReptile
 
+    tf.get_logger().setLevel('INFO')
 
     logger.configure(dir="./meta_offloading20_log-inner_step1/", format_strs=['stdout', 'log', 'csv'])
 
