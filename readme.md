@@ -13,7 +13,7 @@ conda create --name tf-1.15 anaconda python=3.6
 conda activate tf-1.15
 ```
 
-### Install tensorflow-1.15 GPU or CPU
+### Install Tensorflow-1.15 GPU or CPU
 ```bash 
 pip install tensorflow-gpu==1.15
 ```

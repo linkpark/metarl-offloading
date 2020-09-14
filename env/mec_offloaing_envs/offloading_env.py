@@ -98,9 +98,9 @@ class OffloadingEnvironment(MetaEnv):
         self.graph_number = graph_number
 
         # these 3 parameters are used to calculate the processing energy consumption
-        self.rho = 1.25 * 10 ** -26
-        self.f_l = 0.8 * 10 ** 9
-        self.zeta = 3
+        # self.rho = 1.25 * 10 ** -26
+        # self.f_l = 0.8 * 10 ** 9
+        # self.zeta = 3
 
         # these 2 parameters are used to calculate the transmission energy consumption
         self.ptx = 1.258
@@ -372,7 +372,7 @@ class OffloadingEnvironment(MetaEnv):
                 task_finish_time = FT_locally[i]
 
                 # calculate the energy consumption
-                energy_consumption = T_l[i] * self.rho * (self.f_l ** self.zeta)
+                #energy_consumption = T_l[i] * self.rho * (self.f_l ** self.zeta)
             # mcc scheduling
             else:
                 if len(task_graph.pre_task_sets[i]) != 0:
@@ -397,7 +397,7 @@ class OffloadingEnvironment(MetaEnv):
                     FT_wr[i] = wr_finish_time
 
                     # calculate the energy consumption
-                    energy_consumption = T_ul[i] * self.ptx + T_dl[i] * self.prx
+                    #energy_consumption = T_ul[i] * self.ptx + T_dl[i] * self.prx
 
                 else:
                     ws_start_time = ws_avaliable_time
@@ -416,21 +416,16 @@ class OffloadingEnvironment(MetaEnv):
                     FT_wr[i] = wr_finish_time
 
                     # calculate the energy consumption
-                    energy_consumption = T_ul[i] * self.ptx + T_dl[i] * self.prx
+                    #energy_consumption = T_ul[i] * self.ptx + T_dl[i] * self.prx
 
                 task_finish_time = wr_finish_time
 
             # print("task  {} finish time is {}".format(i , task_finish_time))
-            total_energy += energy_consumption
             delta_make_span = max(task_finish_time, current_FT) - current_FT
-            delta_energy = energy_consumption
-
             current_FT = max(task_finish_time, current_FT)
-
             return_latency.append(delta_make_span)
-            return_energy.append(delta_energy)
 
-        return return_latency, return_energy, current_FT, total_energy
+        return return_latency, current_FT
 
     def score_func(self, cost, max_time, min_time):
         return -(cost - min_time) / (max_time - min_time)
@@ -446,26 +441,16 @@ class OffloadingEnvironment(MetaEnv):
             task_graph = task_graph_batch[i]
             self.resource_cluster.reset()
             plan = action_sequence_batch[i]
-            cost, energy, task_finish_time, total_energy = self.get_scheduling_cost_step_by_step(plan, task_graph)
+            cost, task_finish_time = self.get_scheduling_cost_step_by_step(plan, task_graph)
 
             latency = self.score_func(cost, max_running_time, min_running_time)
 
-            max_energy = max_running_time * max((self.rho * (self.f_l ** self.zeta)) , (self.ptx +self.prx) )
-            min_energy = min_running_time * min((self.rho * (self.f_l ** self.zeta)) , (self.ptx +self.prx) )
-
-            #print("max_energy", max_energy)
-            #print("min_energy", min_energy)
-            energy = self.score_func(energy, max_energy, min_energy)
-            #print("energy score", energy)
-
-            score = self.lambda_t * np.array(latency) + self.lambda_e * np.array(energy)
+            score =  np.array(latency)
             #print("score is", score)
             target_batch.append(score)
             task_finish_time_batch.append(task_finish_time)
 
         target_batch = np.array(target_batch)
-        # print("target_batch shape is:", target_batch.shape)
-        # print("task_finish_time_batch shape is: ", np.array(task_finish_time_batch).shape)
         return target_batch, task_finish_time_batch
 
     def greedy_solution(self):
@@ -570,19 +555,12 @@ class OffloadingEnvironment(MetaEnv):
         print("exhausted plan size: ", len(plan_batch))
 
         task_graph_optimal_costs = []
-        task_graph_optimal_energys = []
         optimal_plan = []
-        optimal_makespan_plan_energy_cost = []
-        task_graph_optimal_makespan_energy= []
-        optimal_plan_e = []
-
 
         for task_graph_batch in self.task_graphs_batchs:
             task_graph_batch_cost = []
-            task_graph_batch_energy = []
             for task_graph in task_graph_batch:
                 plans_costs = []
-                plans_energy = []
                 prioritize_plan = []
 
                 for plan in plan_batch:
@@ -590,35 +568,23 @@ class OffloadingEnvironment(MetaEnv):
                     for action, task_id in zip(plan, task_graph.prioritize_sequence):
                         plan_sequence.append((task_id, action))
 
-                    cost, energy, task_finish_time, energy_cost = self.get_scheduling_cost_step_by_step(plan_sequence, task_graph)
+                    cos, task_finish_time = self.get_scheduling_cost_step_by_step(plan_sequence, task_graph)
                     plans_costs.append(task_finish_time)
-                    plans_energy.append(energy_cost)
 
                     prioritize_plan.append(plan_sequence)
 
                 graph_min_cost = min(plans_costs)
-                graph_min_energy = min(plans_energy)
 
                 optimal_plan.append(prioritize_plan[np.argmin(plans_costs)])
-                optimal_plan_e.append(prioritize_plan[np.argmin(plans_energy)])
-                optimal_makespan_plan_energy_cost.append(plans_energy[np.argmin(plans_costs)])
 
                 task_graph_batch_cost.append(graph_min_cost)
-                task_graph_batch_energy.append(graph_min_energy)
 
             print("task_graph_batch cost shape is {}".format(np.array(task_graph_batch_cost).shape))
             avg_minimal_cost = np.mean(task_graph_batch_cost)
-            avg_energy = np.mean(optimal_makespan_plan_energy_cost)
-            avg_minimal_energy = np.mean(task_graph_batch_energy)
 
             task_graph_optimal_costs.append(avg_minimal_cost)
-            task_graph_optimal_makespan_energy.append(avg_energy)
-            task_graph_optimal_energys.append(avg_minimal_energy)
-
 
         self.optimal_solution = task_graph_optimal_costs
-        self.optimal_energy =task_graph_optimal_energys
-        print("energy consumption for optimal plan:", task_graph_optimal_makespan_energy)
         return task_graph_optimal_costs, optimal_plan
 
     def get_running_cost(self, action_sequence_batch, task_graph_batch):
@@ -632,42 +598,37 @@ class OffloadingEnvironment(MetaEnv):
                                        task_graph.prioritize_sequence):
                 plan_sequence.append((task_id, action))
 
-            _, _, task_finish_time, total_energy = self.get_scheduling_cost_step_by_step(plan_sequence, task_graph)
+                _, task_finish_time = self.get_scheduling_cost_step_by_step(plan_sequence, task_graph)
 
             cost_batch.append(task_finish_time)
-            energy_batch.append(total_energy)
 
-        return cost_batch, energy_batch
+        return cost_batch
 
     def get_all_locally_execute_time(self):
         running_cost = []
-        energy_cost = []
         for task_graph_batch, encode_batch in zip(self.task_graphs_batchs, self.encoder_batchs):
             batch_size = encode_batch.shape[0]
             sequence_length = encode_batch.shape[1]
 
             scheduling_action = np.zeros(shape=(batch_size, sequence_length), dtype=np.int32)
-            running_cost_batch, energy_consumption_batch = self.get_running_cost(scheduling_action, task_graph_batch)
+            running_cost_batch = self.get_running_cost(scheduling_action, task_graph_batch)
             running_cost.append(np.mean(running_cost_batch))
-            energy_cost.append(np.mean(energy_consumption_batch))
 
-        return running_cost, energy_cost
+        return running_cost
 
     def get_all_mec_execute_time(self):
         running_cost = []
-        energy_cost = []
 
         for task_graph_batch, encode_batch in zip(self.task_graphs_batchs, self.encoder_batchs):
             batch_size = encode_batch.shape[0]
             sequence_length = encode_batch.shape[1]
 
             scheduling_action = np.ones(shape=(batch_size, sequence_length), dtype=np.int32)
-            running_cost_batch, energy_consumption_batch = self.get_running_cost(scheduling_action, task_graph_batch)
+            running_cost_batch = self.get_running_cost(scheduling_action, task_graph_batch)
 
             running_cost.append(np.mean(running_cost_batch))
-            energy_cost. append(np.mean(energy_consumption_batch))
 
-        return running_cost, energy_cost
+        return running_cost
 
     def greedy_solution_for_current_task(self):
         result_plan, finish_time_batchs = self.greedy_solution()
