@@ -3,7 +3,6 @@ import pickle as pickle
 from multiprocessing import Process, Pipe
 import copy
 
-
 class MetaIterativeEnvExecutor(object):
     """
     Wraps multiple environments of the same kind and provides functionality to reset / step the environments
