@@ -29,7 +29,7 @@ class Trainer(object):
         """
         Implement the MRLCO training process for task offloading problem
         """
-        
+
         start_time = time.time()
         avg_ret = []
         avg_loss = []
